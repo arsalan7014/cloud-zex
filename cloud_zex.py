@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 # ========== CONFIG ========== #
-OPENROUTER_API_KEY =os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "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")  # <- your key here or use Render env vars
 MEMORY_FILE = "memory.json"
 
 # ========== FASTAPI INIT ========== #
@@ -97,22 +97,17 @@ async def chat(request: Request):
     if not user_input:
         return JSONResponse({"response": "Empty prompt"}, status_code=400)
 
-    # Handle memory
+    # Memory check
     memory_response = handle_memory_commands(user_input)
     if memory_response:
         chat_history.append({"role": "user", "content": user_input})
         chat_history.append({"role": "assistant", "content": memory_response})
         return {"response": memory_response}
 
-    # Model routing
+    # AI Response
     model = select_model(user_input)
     chat_history.append({"role": "user", "content": user_input})
     ai_response = get_ai_response(chat_history, model)
     chat_history.append({"role": "assistant", "content": ai_response})
 
     return {"response": ai_response}
-
-if __name__ == "__main__":
-    import uvicorn
-    port = int(os.environ.get("PORT", 10000))  # Render dynamically assigns a port
-    uvicorn.run("cloud_zex:app", host="0.0.0.0", port=port, reload=False)
