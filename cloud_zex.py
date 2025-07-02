@@ -1,4 +1,3 @@
-
 import os
 import json
 import requests
@@ -7,7 +6,7 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 # ========== CONFIG ========== #
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_API_KEY =os.getenv("OPENROUTER_API_KEY")
 MEMORY_FILE = "memory.json"
 
 # ========== FASTAPI INIT ========== #
