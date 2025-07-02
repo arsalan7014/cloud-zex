@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 # ========== CONFIG ========== #
-OPENROUTER_API_KEY = "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"
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 MEMORY_FILE = "memory.json"
 
 # ========== FASTAPI INIT ========== #
