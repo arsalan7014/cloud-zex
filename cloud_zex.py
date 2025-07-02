@@ -89,10 +89,6 @@ def get_ai_response(prompt):
         return f"Error: {res.status_code}"
 
 # ==== API Routes ====
-@app.get("/")
-def root():
-    return {"status": "Cloud ZEX is online"}
-
 @app.post("/chat")
 async def chat(req: Request):
     data = await req.json()
@@ -100,7 +96,8 @@ async def chat(req: Request):
 
     mem_response = handle_memory(prompt)
     if mem_response:
-        return {"response": mem_response, "source": "memory"}
+        return {"reply": mem_response, "source": "memory"}
 
     ai_response = get_ai_response(prompt)
-    return {"response": ai_response, "source": "llm"}
+    return {"reply": ai_response, "source": "llm"}
+
