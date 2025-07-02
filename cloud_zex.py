@@ -111,3 +111,7 @@ async def chat(request: Request):
     chat_history.append({"role": "assistant", "content": ai_response})
 
     return {"response": ai_response}
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 10000))
+    uvicorn.run("cloud_zex:app", host="0.0.0.0", port=port)
