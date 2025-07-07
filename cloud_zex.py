@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Request
 import json
-import uuid
 import os
 import requests
 import firebase_admin
@@ -9,12 +8,9 @@ from firebase_admin import credentials, firestore
 app = FastAPI()
 
 # ==== FIREBASE INIT ====
-# Load the Firebase credentials from the local JSON file
-firebase_json = os.getenv("FIREBASE_KEY", "")
-firebase_dict = json.loads(firebase_json.replace('\\n', '\n'))
-cred = credentials.Certificate(firebase_dict)
+# Load credentials from local JSON file (you must place this in your project root)
+cred = credentials.Certificate("firebase_key.json")
 firebase_admin.initialize_app(cred)
-
 db = firestore.client()
 
 # ==== Firestore Memory ====
@@ -52,6 +48,7 @@ def handle_memory(command):
             return f"I don't remember {key}."
 
     return None
+
 # ==== Model Selection ====
 def select_model(prompt: str) -> str:
     p = prompt.lower()
@@ -74,7 +71,7 @@ def get_ai_response(prompt):
 
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        "HTTP-Referer": "https://your-zex.com",  # Replace if needed
+        "HTTP-Referer": "https://your-zex.com",  # Optional
         "X-Title": "Cloud ZEX AI"
     }
 
