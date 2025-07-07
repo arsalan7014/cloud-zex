@@ -9,9 +9,8 @@ from firebase_admin import credentials, firestore
 app = FastAPI()
 
 # ==== FIREBASE INIT ====
-firebase_json = os.getenv("FIREBASE_KEY")
-firebase_dict = json.loads(firebase_json)
-cred = credentials.Certificate(firebase_dict)
+# Load the Firebase credentials from the local JSON file
+cred = credentials.Certificate("zex-memory-firebase-adminsdk-fbsvc-72c5363461.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
@@ -67,7 +66,7 @@ def get_ai_response(prompt):
 
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        "HTTP-Referer": "https://your-zex.com",
+        "HTTP-Referer": "https://your-zex.com",  # Replace if needed
         "X-Title": "Cloud ZEX AI"
     }
 
@@ -80,17 +79,19 @@ def get_ai_response(prompt):
     if res.ok:
         return res.json()['choices'][0]['message']['content']
     else:
-        return f"Error: {res.status_code}"
+        return f"Error: {res.status_code} - {res.text}"
 
-# ==== API Routes ====
+# ==== API Endpoint ====
 @app.post("/chat")
 async def chat(req: Request):
     data = await req.json()
     prompt = data.get("message", "")
 
+    # First check memory logic
     mem_response = handle_memory(prompt)
     if mem_response:
         return {"reply": mem_response, "source": "memory"}
 
+    # Then use AI
     ai_response = get_ai_response(prompt)
     return {"reply": ai_response, "source": "llm"}
