@@ -19,14 +19,20 @@ def handle_memory(command):
     lowered = command.lower()
 
     if lowered.startswith("remember"):
-        parts = command.split("remember")[-1].strip().split(" is ")
-        if len(parts) == 2:
-            key, value = parts[0].strip(), parts[1].strip()
-            db.collection("memory").document(key).set({"value": value})
-            return f"Got it! I will remember {key} is {value}."
+        try:
+            remainder = command[len("remember"):].strip()
+            if " is " in remainder:
+                key, value = remainder.split(" is ", 1)
+                key, value = key.strip(), value.strip()
+                db.collection("memory").document(key).set({"value": value})
+                return f"Got it! I will remember {key} is {value}."
+            else:
+                return "Please use the format: remember [thing] is [value]"
+        except Exception as e:
+            return f"Memory error: {str(e)}"
 
     elif lowered.startswith("forget"):
-        key = command.split("forget")[-1].strip()
+        key = command[len("forget"):].strip()
         doc_ref = db.collection("memory").document(key)
         if doc_ref.get().exists:
             doc_ref.delete()
@@ -35,7 +41,7 @@ def handle_memory(command):
             return f"I don't remember anything about {key}."
 
     elif lowered.startswith("what is") or lowered.startswith("who is"):
-        key = command.split("is")[-1].strip()
+        key = command.split("is", 1)[-1].strip()
         doc = db.collection("memory").document(key).get()
         if doc.exists:
             return doc.to_dict()["value"]
@@ -43,7 +49,6 @@ def handle_memory(command):
             return f"I don't remember {key}."
 
     return None
-
 # ==== Model Selection ====
 def select_model(prompt: str) -> str:
     p = prompt.lower()
