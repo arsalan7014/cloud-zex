@@ -10,8 +10,11 @@ app = FastAPI()
 
 # ==== FIREBASE INIT ====
 # Load the Firebase credentials from the local JSON file
-cred = credentials.Certificate("zex-memory-firebase-adminsdk-fbsvc-72c5363461.json")
+firebase_json = os.getenv("FIREBASE_KEY", "")
+firebase_dict = json.loads(firebase_json.replace('\\n', '\n'))
+cred = credentials.Certificate(firebase_dict)
 firebase_admin.initialize_app(cred)
+
 db = firestore.client()
 
 # ==== Firestore Memory ====
