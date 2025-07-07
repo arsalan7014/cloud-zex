@@ -2,26 +2,28 @@ from fastapi import FastAPI, Request
 import json
 import uuid
 import os
-from pathlib import Path
 import requests
+import firebase_admin
+from firebase_admin import credentials, firestore
 
 app = FastAPI()
 
-# ==== Memory ====
-MEMORY_FILE = Path("memory.json")
+# ==== Firebase Firestore ====
+firebase_json = os.getenv("FIREBASE_KEY")  # From Railway Environment Variables
+cred = credentials.Certificate(json.loads(firebase_json))
+firebase_admin.initialize_app(cred)
+db = firestore.client()
+
+USER_ID = "default_user"
 
 def load_memory():
-    if MEMORY_FILE.exists():
-        try:
-            with open(MEMORY_FILE, "r") as f:
-                return json.load(f)
-        except:
-            return {}
+    doc = db.collection("zex_memory").document(USER_ID).get()
+    if doc.exists:
+        return doc.to_dict()
     return {}
 
 def save_memory(memory):
-    with open(MEMORY_FILE, "w") as f:
-        json.dump(memory, f, indent=2)
+    db.collection("zex_memory").document(USER_ID).set(memory)
 
 memory = load_memory()
 
@@ -88,7 +90,7 @@ def get_ai_response(prompt):
     else:
         return f"Error: {res.status_code}"
 
-# ==== API Routes ====
+# ==== API Route ====
 @app.post("/chat")
 async def chat(req: Request):
     data = await req.json()
@@ -100,4 +102,3 @@ async def chat(req: Request):
 
     ai_response = get_ai_response(prompt)
     return {"reply": ai_response, "source": "llm"}
-
