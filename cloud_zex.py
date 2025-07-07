@@ -2,7 +2,6 @@ from fastapi import FastAPI, Request
 import json
 import uuid
 import os
-from pathlib import Path
 import requests
 import firebase_admin
 from firebase_admin import credentials, firestore
@@ -10,7 +9,9 @@ from firebase_admin import credentials, firestore
 app = FastAPI()
 
 # ==== FIREBASE INIT ====
-cred = credentials.Certificate("zex-memory-firebase-adminsdk-fbsvc-72c5363461.json")
+firebase_json = os.getenv("FIREBASE_KEY")
+firebase_dict = json.loads(firebase_json)
+cred = credentials.Certificate(firebase_dict)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
