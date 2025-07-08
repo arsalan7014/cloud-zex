@@ -2,8 +2,6 @@ from fastapi import FastAPI, Request
 import json
 import os
 import requests
-import firebase_admin
-from firebase_admin import credentials, firestore
 
 app = FastAPI()
 
@@ -49,12 +47,5 @@ def get_ai_response(prompt):
 async def chat(req: Request):
     data = await req.json()
     prompt = data.get("message", "")
-
-    # First check memory logic
-    mem_response = handle_memory(prompt)
-    if mem_response:
-        return {"reply": mem_response, "source": "memory"}
-
-    # Then use AI
     ai_response = get_ai_response(prompt)
     return {"reply": ai_response, "source": "llm"}
