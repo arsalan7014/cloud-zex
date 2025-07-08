@@ -7,48 +7,6 @@ from firebase_admin import credentials, firestore
 
 app = FastAPI()
 
-# ==== FIREBASE INIT ====
-# Load credentials from local JSON file (you must place this in your project root)
-cred = credentials.Certificate("firebase_key.json")
-firebase_admin.initialize_app(cred)
-db = firestore.client()
-
-# ==== Firestore Memory ====
-def handle_memory(command):
-    lowered = command.lower()
-
-    if lowered.startswith("remember"):
-        try:
-            remainder = command[len("remember"):].strip()
-            if " is " in remainder:
-                key, value = remainder.split(" is ", 1)
-                key, value = key.strip(), value.strip()
-                db.collection("memory").document(key).set({"value": value})
-                return f"Got it! I will remember {key} is {value}."
-            else:
-                return "Please use the format: remember [thing] is [value]"
-        except Exception as e:
-            return f"Memory error: {str(e)}"
-
-    elif lowered.startswith("forget"):
-        key = command[len("forget"):].strip()
-        doc_ref = db.collection("memory").document(key)
-        if doc_ref.get().exists:
-            doc_ref.delete()
-            return f"I forgot what {key} is."
-        else:
-            return f"I don't remember anything about {key}."
-
-    elif lowered.startswith("what is") or lowered.startswith("who is"):
-        key = command.split("is", 1)[-1].strip()
-        doc = db.collection("memory").document(key).get()
-        if doc.exists:
-            return doc.to_dict()["value"]
-        else:
-            return f"I don't remember {key}."
-
-    return None
-
 # ==== Model Selection ====
 def select_model(prompt: str) -> str:
     p = prompt.lower()
