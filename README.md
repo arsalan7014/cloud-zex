@@ -1,4 +1,3 @@
-# cloud-zex
 # 🌌 Cloud ZEX AI Assistant
 
 Cloud ZEX is a **JARVIS-like personal AI assistant** built with **FastAPI**, **OpenRouter LLMs**, and **Firebase Firestore** memory.
